@@ -6,42 +6,45 @@ from selenium.webdriver.common.by import By
 LEGO_ID = "41916"
 
 
-def text_preprocessing_remove_nondigits (text: str)->str:
-    digits = '123456789'
-    for t in text:
-        if t not in digits:
-            text = text.replace (t,'')
-    return text
-
-
-def getting_amazon_url (lego_id:str)->str:
+def get_amazon_url (lego_id:str)->str:
     query = {'k': f"lego {lego_id}"}
     query_encoded = urllib.parse.urlencode(query)
     url = f"https://www.amazon.com/s?{query_encoded}&ref=nb_sb_ss_recent_1_0_recent"
     return url
 
 
-def scrapping_price_element (url: str)->str:
+def define_title_with_lego_id (titles: list, lego_id: str):
+    for t in titles:
+        if lego_id in t.text:
+            title_with_lego_id = t
+            return title_with_lego_id
+
+
+def scrap_price_whole (url: str, lego_id: str)->str:
     driver = webdriver.Chrome()
     driver.get(url)
-    elements_by_class = driver.find_elements(By.XPATH, f'//*[@class="a-price"]')
-    elements = [e.text for e in elements_by_class]
-    price_element = elements[0]
-    driver.quit()
-    return price_element
+    titles = driver.find_elements(By.XPATH, r'//*[@id="search"]/div[1]/div[1]/div/span[1]/div[1]/div/div/div/div/div/div[2]')
+    title_with_lego_id = define_title_with_lego_id (titles, lego_id)
+    price_element = title_with_lego_id.find_elements(By.XPATH, r'.//*[@class="a-price"]')
+    price_whole = price_element[0].text
+    driver.quit
+    return price_whole
 
 
-def extract_amazon_current_price(price_element: str)->float:
-    price_whole = text_preprocessing_remove_nondigits(price_element)
-    amazon_price = float (f"{price_whole[:-2]}.{price_whole[-2:]}")
-    return amazon_price
+def string_to_float (text: str)->float:
+    digits = '1234567890'
+    for t in text:
+        if t not in digits:
+            text = text.replace (t,'')
+    price = float (f"{text[:-2]}.{text[-2:]}")
+    return price
 
 
 def main(lego_id:str)->None:
-    url = getting_amazon_url(lego_id)
-    price_element = scrapping_price_element(url)
-    amazon_current_price = extract_amazon_current_price (price_element)
-    print(amazon_current_price)
+    url = get_amazon_url(lego_id)
+    price_whole = scrap_price_whole (url, lego_id)
+    amazon_current_price = string_to_float (price_whole) 
+    print (amazon_current_price)
 
 
 if __name__ == "__main__":
