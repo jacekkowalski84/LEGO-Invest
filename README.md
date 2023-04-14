@@ -4,6 +4,10 @@
 # Dataset Description
 The dataset can be found in the 'data/lego_population.csv' subfolder and includes information on 1300 LEGO sets, such as their ID number, theme, year of release, catalogue price, and Amazon price.
 
+# Modules description
+The web-scrapping module can be found in 'scrap_amazon_price.py'
+The data analysis module can be found in 'LEGO.ipynb'
+
 # How it Works
 1.The program reads the CSV file containing the data and saves it to a dataframe variable.
 
@@ -24,4 +28,4 @@ Please note that the program requires an internet connection to update the Amazo
 # Code and Resources Used
 Python Version: 3.10.7
 
-Modules: datetime, pandas, selenium, urllib.parse
+Modules: datetime, click, concurrent.futures, pandas, selenium, urllib.parse 
